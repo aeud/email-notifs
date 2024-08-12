@@ -1,0 +1,7 @@
+Dockerfile
+.dockerignore
+__pycache__
+.pytest_cache
+venv
+output.html
+.env
