@@ -19,10 +19,9 @@ env = Environment(
     autoescape=select_autoescape()
 )
 
-
-MAILGUN_API_URL = "https://api.mailgun.net/v3/eudes.co/messages"
-FROM_EMAIL_ADDRESS = "bot@eudes.co"
-
+FROM_EMAIL_ADDRESS = os.getenv("FROM_EMAIL_ADDRESS")
+MAILGUN_API_URL = os.getenv("MAILGUN_API_URL")
+MAILGUN_API_KEY = os.getenv("MAILGUN_API_KEY")
 
 def send_single_email(to_address, subject, message, html, debug=False):
     if debug:
@@ -31,10 +30,10 @@ def send_single_email(to_address, subject, message, html, debug=False):
             file.close()
             return
     try:
-        api_key = os.getenv("MAILGUN_API_KEY")
+        
         resp = requests.post(
             MAILGUN_API_URL,
-            auth=("api", api_key),
+            auth=("api", MAILGUN_API_KEY),
             data={
                 "from": FROM_EMAIL_ADDRESS,
                 "to": to_address,
@@ -51,14 +50,6 @@ def send_single_email(to_address, subject, message, html, debug=False):
 
     except Exception as ex:
         logging.exception(f"Mailgun error: {ex}")
-
-# def main():
-#     message = "Testing Mailgun API for a single email"
-#     subject = "🆘 Oops, something went wrong"
-#     to = "adrien.eudes@gmail.com"
-#     template = env.get_template("main.html")
-#     html = template.render(message=message, subject=subject)
-#     send_single_email(to, subject, message, html, debug=False)
 
 @app.route("/", methods=["POST"])
 def index():
@@ -88,8 +79,4 @@ def index():
         send_single_email(to, subject, message, html, debug=False)
 
     return ("", 204)
-
-# if __name__ == "__main__":
-#     main()
-    
     
